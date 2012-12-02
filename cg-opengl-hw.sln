@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texturing", "src\texturing\texturing.vcxproj", "{6E5DCFE6-4110-4CCD-88D0-C17E17F241B6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shared", "src\shared\shared.vcxproj", "{2990006E-E4A0-4E9C-8D3D-823F402EC9F2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "md2", "src\md2\md2.vcxproj", "{3EDA6D9A-60D3-46F4-8878-121453A96141}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6E5DCFE6-4110-4CCD-88D0-C17E17F241B6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6E5DCFE6-4110-4CCD-88D0-C17E17F241B6}.Debug|Win32.Build.0 = Debug|Win32
+		{6E5DCFE6-4110-4CCD-88D0-C17E17F241B6}.Release|Win32.ActiveCfg = Release|Win32
+		{6E5DCFE6-4110-4CCD-88D0-C17E17F241B6}.Release|Win32.Build.0 = Release|Win32
+		{2990006E-E4A0-4E9C-8D3D-823F402EC9F2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2990006E-E4A0-4E9C-8D3D-823F402EC9F2}.Debug|Win32.Build.0 = Debug|Win32
+		{2990006E-E4A0-4E9C-8D3D-823F402EC9F2}.Release|Win32.ActiveCfg = Release|Win32
+		{2990006E-E4A0-4E9C-8D3D-823F402EC9F2}.Release|Win32.Build.0 = Release|Win32
+		{3EDA6D9A-60D3-46F4-8878-121453A96141}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3EDA6D9A-60D3-46F4-8878-121453A96141}.Debug|Win32.Build.0 = Debug|Win32
+		{3EDA6D9A-60D3-46F4-8878-121453A96141}.Release|Win32.ActiveCfg = Release|Win32
+		{3EDA6D9A-60D3-46F4-8878-121453A96141}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
