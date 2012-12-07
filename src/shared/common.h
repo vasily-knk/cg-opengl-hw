@@ -1,7 +1,5 @@
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -16,4 +14,14 @@ using std::ofstream;
 #include <vector>
 using std::vector;
 
+
 #include <boost/foreach.hpp>
+
+//#include <boost/bind.hpp>
+
+#include <set>
+using std::set;
+
+#include <GL/glew.h>
+#include <GL/glut.h>
+#include <SOIL.h>
