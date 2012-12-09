@@ -1,6 +1,6 @@
 #pragma once
 
-#include "resources.h"
+#include "../shared/resources.h"
 
 namespace cg_homework
 {

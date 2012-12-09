@@ -8,6 +8,10 @@
   <PropertyGroup>
     <IntDir>$(SolutionDir)out\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>SOIL.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

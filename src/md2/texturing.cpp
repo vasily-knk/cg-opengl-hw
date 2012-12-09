@@ -3,12 +3,20 @@
 
 #include "stdafx.h"
 #include "../shared/resources.h"
-#include "../shared/md2.h"
+//#include "../envir.h"
 #include "../shared/scene.h"
 #include "../shared/rotator.h"
+#include "md2.h"
 
 namespace cg_homework
 {
+struct file_not_found_exception
+    : std::runtime_error
+{
+    file_not_found_exception(const string &filename)
+        : std::runtime_error(string("File not found: ") + filename)
+    {}
+};
 
 class md2_scene : public scene
 {

@@ -9,7 +9,7 @@ rotator::rotator(scene &s)
     , dragging_(false)
     , angle_x_(0.0f)
     , angle_y_(0.0f)
-    , dist_(-100.0f)
+    , dist_(-3.0f)
 {}
 
 void rotator::resize(int width, int height)
@@ -70,11 +70,11 @@ void rotator::mouse_button(int button, int state, int x, int y)
     }
     else if (button == 3)
     {
-        dist_ += 10.0f;
+        dist_ += 0.1f;
     }
     else if (button == 4)
     {
-        dist_ -= 10.0f;
+        dist_ -= 0.1f;
     }
     scene_->mouse_button(button, state, x, y);
 }
