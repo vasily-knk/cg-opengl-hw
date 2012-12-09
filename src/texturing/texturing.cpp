@@ -26,6 +26,8 @@ public:
     void init();
     void draw(); 
     void update(float elapsed_seconds); 
+    void resize(int width, int height);
+    void update_modelview(const glm::mat4 &matrix);
 
 private:
     void load_model();
@@ -39,6 +41,8 @@ private:
     
     float frame_;
     int anim_begin_, anim_end_;
+
+    glm::mat4 modelview_, projection_;
 };
 
 
@@ -55,13 +59,21 @@ md2_scene::md2_scene(const string &md2_filename, const string &texture_filename)
 
 void md2_scene::update(float el_time)
 {
+/*
     frame_ += el_time * 12.0f;
-    while(frame_ > anim_end_ - anim_begin_)
+    if (frame_ > anim_end_ - anim_begin_)
         frame_ -= anim_end_ - anim_begin_;
+*/
 }
 
 void md2_scene::draw()
 {
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(glm::value_ptr(projection_));
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(glm::value_ptr(modelview_));
+
     glClearColor(0, 0, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -84,17 +96,20 @@ void md2_scene::init()
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);						// Enable Vertex Arrays
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+/*
     anim_begin_ = 73;
-    anim_end_ = 85;
+    anim_end_ = 85;*/
 
     load_model();
     load_texture();
 }
 
-void resize(int width, int height)
+void md2_scene::resize(int width, int height)
 {
-    (void)width;
-    (void)height;
+    //glMatrixMode(GL_PROJECTION);
+    //glLoadIdentity();
+    //gluPerspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 1000.0f);
+    projection_ = glm::perspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 1000.0f);
 }
 
 void md2_scene::load_model()
@@ -124,11 +139,15 @@ void md2_scene::load_texture()
     texture_ = use_gl_texture(texture_id);
 }
 
+void md2_scene::update_modelview(const glm::mat4 &matrix)
+{
+    modelview_ = matrix;
+}
+
 void glut_init(scene &s);
 void glut_main_loop();
 
 }
-
 
 int main(int argc, char **argv)
 {
@@ -151,7 +170,6 @@ int main(int argc, char **argv)
     }
 
     glut_main_loop();
-    
     return 0;
 }
 

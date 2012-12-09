@@ -28,6 +28,7 @@ namespace
     void glut_resize(int width, int height) { glut_scene->resize(width, height); }
     void glut_mouse_move(int x, int y)      { glut_scene->mouse_move(x, y); }
     void glut_mouse_button(int button, int state, int x, int y) { glut_scene->mouse_button(button, state, x, y); }
+    void glut_mouse_wheel(int wheel, int dir, int x, int y) { glut_scene->mouse_button(wheel, dir, x, y); }
 
 }
 
@@ -45,6 +46,7 @@ void glut_init(scene &s)
     glutReshapeFunc(glut_resize);
     glutMouseFunc  (glut_mouse_button);
     glutMotionFunc (glut_mouse_move);    
+    //glutMouseWheelFunc(glut_mouse_wheel);    
 }
 
 void glut_main_loop()

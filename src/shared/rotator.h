@@ -18,13 +18,15 @@ public:
 
     void mouse_move(int /*x*/, int /*y*/);
     void mouse_button(int /*button*/, int /*state*/, int /*x*/, int /*y*/);
+    void mouse_wheel(int /*wheel*/, int /*direction*/, int /*x*/, int /*y*/);
 
 private:
     scene *scene_;
 
     bool dragging_;
     int drag_x_, drag_y_;
-    float angle;
+    float angle_x_, angle_y_;
+    float dist_;
 };
 
 }

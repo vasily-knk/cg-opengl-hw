@@ -7,33 +7,36 @@ namespace cg_homework
 rotator::rotator(scene &s)
     : scene_(&s)
     , dragging_(false)
-    , angle(0.0f)
+    , angle_x_(0.0f)
+    , angle_y_(0.0f)
+    , dist_(-100.0f)
 {}
 
 void rotator::resize(int width, int height)
 {
     glViewport(0, 0, width, height);				    // Reset The Current Viewport
 
-    glMatrixMode(GL_PROJECTION);					    // Select The Projection Matrix
-    glLoadIdentity();									// Reset The Projection Matrix
-
-    // Calculate The Aspect Ratio Of The Window
-    gluPerspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 1000.0f);
     scene_->resize(width, height);
 }
 
 void rotator::update(float elapsed_seconds)
 {
+    glm::mat4 matrix(1.0f);
+    matrix = glm::translate(matrix, glm::vec3(0, 0, dist_));
+    matrix = glm::rotate(matrix, angle_x_, glm::vec3(1, 0, 0));
+    matrix = glm::rotate(matrix, angle_y_, glm::vec3(0, 1, 0));
+    scene_->update_modelview(matrix);
     scene_->update(elapsed_seconds);
 }
 
 void rotator::draw()
 {
-    glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
-    glLoadIdentity();									// Reset The Modelview Matrix}
-    glTranslatef(0.0f, 0.0f, -100.0f);
-    glRotatef(-90.0f, 1, 0, 0);
-    glRotatef(angle, 0, 0, 1);
+    //glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
+    //glLoadIdentity();									// Reset The Modelview Matrix}
+    //glTranslatef(0.0f, 0.0f, dist_);
+    //glRotatef(-90.0f, 1, 0, 0);
+    //glRotatef(angle_x_, 1, 0, 0);
+    //glRotatef(angle_y_, 0, 1, 0);
 
     scene_->draw();
 }
@@ -42,8 +45,11 @@ void rotator::mouse_move(int x, int y)
 {
     if (dragging_)
     {
+        const float deltay = float(y - drag_y_);
+        angle_x_ += deltay * 0.5f;
+
         const float deltax = float(x - drag_x_);
-        angle += deltax * 0.5f;
+        angle_y_ += deltax * 0.5f;
 
         drag_x_ = x;
         drag_y_ = y;
@@ -62,8 +68,23 @@ void rotator::mouse_button(int button, int state, int x, int y)
             drag_y_ = y;
         }
     }
+    else if (button == 3)
+    {
+        dist_ += 10.0f;
+    }
+    else if (button == 4)
+    {
+        dist_ -= 10.0f;
+    }
     scene_->mouse_button(button, state, x, y);
 }
+
+void rotator::mouse_wheel(int wheel, int direction, int x, int y)
+{
+    dist_ += direction * 0.1f;
+    scene_->mouse_wheel(wheel, direction, x, y);
+}
+
 }
 
 
