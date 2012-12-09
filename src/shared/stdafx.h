@@ -6,4 +6,5 @@
 #pragma once
 
 #include "targetver.h"
+
 #include "common.h"

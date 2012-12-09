@@ -2,52 +2,74 @@
 //
 
 #include "stdafx.h"
+#include "../shared/resources.h"
 #include "../shared/md2.h"
+//#include "../envir.h"
+#include "../shared/scene.h"
+#include "../shared/rotator.h"
 
 namespace cg_homework
 {
-
-DWORD last_time = timeGetTime();
-GLuint texture_id_;
-md2_model model;
-float angle = 0;
-const int anim_begin = 73, anim_end = 85;
-float frame = 0;
-int iframe = 0;
-
-void update()
+struct file_not_found_exception
+    : std::runtime_error
 {
-    const DWORD time = timeGetTime();
-    const float el_time = (time - last_time) * 0.001f;
-    last_time = time;
+    file_not_found_exception(const string &filename)
+        : std::runtime_error(string("File not found: ") + filename)
+    {}
+};
 
-    glMatrixMode(GL_MODELVIEW);
-    //glRotatef(float(el_time * 10.0), 0, 1, 0);
-    glutPostRedisplay();
-    frame += el_time * 12.0f;
-    iframe = anim_begin + int(frame) % (anim_end - anim_begin);
+class md2_scene : public scene
+{
+public:
+    md2_scene(const string &md2_filename, const string &texture_filename);
+
+    void init();
+    void draw(); 
+    void update(float elapsed_seconds); 
+
+private:
+    void load_model();
+    void load_texture();
+
+private:
+    string md2_filename_;
+    string texture_filename_;
+    md2_model model_;
+    gl_texture texture_;
+    
+    float frame_;
+    int anim_begin_, anim_end_;
+};
+
+
+md2_scene::md2_scene(const string &md2_filename, const string &texture_filename)
+    : md2_filename_     (md2_filename)
+    , texture_filename_ (texture_filename)
+    , frame_(0.0f)
+    , anim_begin_(0)
+    , anim_end_  (0)
+{
+
 }
 
-void draw()
-{
-    glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
-    glLoadIdentity();									// Reset The Modelview Matrix}
-    glTranslatef(0.0f, 0.0f, -100.0f);
-    glRotatef(-90.0f, 1, 0, 0);
-    glRotatef(angle, 0, 0, 1);
 
+void md2_scene::update(float el_time)
+{
+    frame_ += el_time * 12.0f;
+    while(frame_ > anim_end_ - anim_begin_)
+        frame_ -= anim_end_ - anim_begin_;
+}
+
+void md2_scene::draw()
+{
     glClearColor(0, 0, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //glColor3f(1.0f, 1.0f, 0);
 
-    glBindTexture(GL_TEXTURE_2D, texture_id_);
-
-    model.draw(iframe);
-
-    glutSwapBuffers();
+    glBindTexture(GL_TEXTURE_2D, texture_->id());
+    model_.draw(anim_begin_ + int(frame_));
 }
 
-void init()
+void md2_scene::init()
 {
     glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
     glClearColor(0.0f, 0.0f, 1.0f, 0.5f);				// Black Background
@@ -61,94 +83,75 @@ void init()
     glEnableClientState(GL_VERTEX_ARRAY);						// Enable Vertex Arrays
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);						// Enable Vertex Arrays
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    anim_begin_ = 73;
+    anim_end_ = 85;
+
+    load_model();
+    load_texture();
 }
 
 void resize(int width, int height)
 {
-    glViewport(0, 0, width, height);				    // Reset The Current Viewport
-
-    glMatrixMode(GL_PROJECTION);					    // Select The Projection Matrix
-    glLoadIdentity();									// Reset The Projection Matrix
-
-    // Calculate The Aspect Ratio Of The Window
-    gluPerspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 1000.0f);
+    (void)width;
+    (void)height;
 }
 
-bool dragging = false;
-int drag_x = 0, drag_y = 0;
-void mouse_button(int button, int state, int x, int y)
+void md2_scene::load_model()
 {
-    if (button == GLUT_LEFT_BUTTON)
-    {
-        dragging = (state == GLUT_DOWN);
-        if (dragging)
-        {
-            drag_x = x;
-            drag_y = y;
-        }
-    }
-}
-
-void mouse_move(int x, int y)
-{
-    if (dragging)
-    {
-        const float deltax = float(x - drag_x);
-        angle += deltax * 0.5f;
-
-        drag_x = x;
-        drag_y = y;
-    }
-}
-
-bool load_model()
-{
-    ifstream file("infantry.md2", ios_base::in | ios_base::binary);
+    ifstream file(md2_filename_.c_str(), ios_base::in | ios_base::binary);
     if (!file.is_open())
-        return false;
+        throw file_not_found_exception(md2_filename_);
 
-    return model.load(file);
+    model_.load(file);
 }
 
-bool load_texture()
+void md2_scene::load_texture()
 {
-    texture_id_ = SOIL_load_OGL_texture
-        ("infantry.tga",
+    GLuint texture_id = SOIL_load_OGL_texture
+        (texture_filename_.c_str(),
         SOIL_LOAD_AUTO,
         SOIL_CREATE_NEW_ID,
         SOIL_FLAG_MIPMAPS);
 
-    if (texture_id_ == 0)
-        return false;
+    if (texture_id == 0)
+        throw file_not_found_exception(texture_filename_);
 
-    glBindTexture(GL_TEXTURE_2D, texture_id_);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    return true;
+    texture_ = use_gl_texture(texture_id);
 }
 
+void glut_init(scene &s);
+void glut_main_loop();
+
 }
+
 
 int main(int argc, char **argv)
 {
     using namespace cg_homework;
 
-    glutInit(&argc, argv);
-    glutCreateWindow("Hello!");
-    glutDisplayFunc(draw);
-    glutIdleFunc(update);
-    glutReshapeFunc(resize);
-    glutMouseFunc(mouse_button);
-    glutMotionFunc(mouse_move);
-    
+    md2_scene scene("infantry.md2", "infantry.tga");
+    rotator r(scene);
+
+    glut_init(r);
     glewInit();
-    init();
-
-    if (!load_model() || !load_texture())
+    
+    try
+    {
+        scene.init();
+    }
+    catch (const file_not_found_exception &e)
+    {
+        std::cerr << e.what() << endl;
         return -1;
+    }
 
-    glutMainLoop();
+    glut_main_loop();
+    
     return 0;
 }
 
