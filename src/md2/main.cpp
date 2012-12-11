@@ -3,20 +3,13 @@
 
 #include "stdafx.h"
 #include "../shared/resources.h"
-//#include "../envir.h"
 #include "../shared/scene.h"
 #include "../shared/rotator.h"
+#include "../shared/stuff.h"
 #include "md2.h"
 
 namespace cg_homework
 {
-struct file_not_found_exception
-    : std::runtime_error
-{
-    file_not_found_exception(const string &filename)
-        : std::runtime_error(string("File not found: ") + filename)
-    {}
-};
 
 class md2_scene : public scene
 {
@@ -59,11 +52,9 @@ md2_scene::md2_scene(const string &md2_filename, const string &texture_filename)
 
 void md2_scene::update(float el_time)
 {
-
     frame_ += el_time * 6.0f;
     if (frame_ > anim_end_ - anim_begin_)
         frame_ -= anim_end_ - anim_begin_;
-
 }
 
 void md2_scene::draw()

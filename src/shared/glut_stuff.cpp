@@ -22,7 +22,13 @@ namespace
         last_time = new_time;
 
         glut_scene->update(el_time);
-        glutPostRedisplay();
+
+        static ptime last_render = microsec_clock::local_time();
+        if ((new_time - last_render).total_milliseconds() > 16)
+        {
+            glutPostRedisplay();
+            last_render = new_time;
+        }
     }
     
     void glut_resize(int width, int height) { glut_scene->resize(width, height); }

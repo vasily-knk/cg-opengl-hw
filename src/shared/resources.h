@@ -14,7 +14,7 @@ namespace cg_homework
         ~gl_resource_keeper() { G::del(1, &id_); }
 
         GLuint id() const { return id_; }
-
+        
     private:
         GLuint id_;
     };

@@ -35,7 +35,7 @@
     <ClCompile Include="md2_load.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="texturing.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
