@@ -113,11 +113,15 @@ namespace cg_homework
 
         auto load_frames = [&]()
         {
+            
+            vector<string> names;
+            
             src.seekg(header.ofs_frames);
             for (int n_frame = 0; n_frame < header.num_frames; ++n_frame)
             {
                 const auto frame_desc = read_struct<frame_t>(src);
                 frame_buffer_t &frame = frames_buffer[n_frame];
+                names.push_back(frame_desc.name);
 
                 for (int n_vertex = 0; n_vertex < header.num_xyz; ++n_vertex)
                 {
@@ -133,6 +137,7 @@ namespace cg_homework
                     }
                 }
             }
+            load_animations(names);
         };
 
         auto load_texcoords = [&]()
@@ -179,4 +184,56 @@ namespace cg_homework
 
         return true;
     }
+
+    void md2_model::load_animations(vector<string> &names)
+    {
+        // not a real version - looking only at last digit
+        anim a;
+        a.name = names[0];
+        a.begin = 0;
+
+        if (names.size() == 1)
+        {
+            a.end = 0;
+            anims_.push_back(a);
+            return;
+        }
+
+        const size_t DIGITS = 2;
+        for (size_t i = 1; i < names.size(); ++i)
+        {
+            const string &name = names[i];
+            const string &prev = names[i - 1];
+            const size_t len = name.length();
+
+            bool cont = true;
+
+            cont = cont && (len >= DIGITS);
+            cont = cont && prev.length() == len;
+            cont = cont && name.substr(0, len - DIGITS) == prev.substr(0, len - DIGITS);
+
+            auto is_digit = [](char c) { return c >= '0' && c <= '9'; };
+            for (size_t d = len - DIGITS; d < len; ++d)
+            {
+                if (!is_digit(name[d]) || !is_digit(prev[d]))
+                {
+                    cont = false;
+                    break;
+                }
+            }
+
+            cont = cont && atol(name.substr(len - DIGITS, DIGITS).c_str()) == atol(prev.substr(len - DIGITS, DIGITS).c_str()) + 1;
+
+            if (!cont)
+            {
+                a.end = i - 1;
+                anims_.push_back(a);
+
+                a.name = names[i];
+                a.begin = i;
+            }
+
+        }
+    }
+
 }

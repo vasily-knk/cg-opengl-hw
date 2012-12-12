@@ -14,8 +14,18 @@ namespace cg_homework
         inline size_t num_frames() const;
         void draw(int frame) const;
 
+    public:
+        struct anim
+        {
+            string name;
+            int begin, end;
+        };
+
+        const vector<anim> &animations() const { return anims_; }
+
     private:
         void cleanup();
+        void load_animations(vector<string> &names);
 
     private:
         typedef GLuint handle;
@@ -26,6 +36,8 @@ namespace cg_homework
         size_t n_verts_;
         size_t n_texcoords_;
         size_t n_indices_;
+
+        vector<anim> anims_;
     };
 
 }

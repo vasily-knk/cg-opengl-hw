@@ -19,6 +19,7 @@ public:
     void mouse_move(int /*x*/, int /*y*/);
     void mouse_button(int /*button*/, int /*state*/, int /*x*/, int /*y*/);
     void mouse_wheel(int /*wheel*/, int /*direction*/, int /*x*/, int /*y*/);
+    void keypress(unsigned char key, int /*x*/, int /*y*/);
 
 private:
     scene *scene_;

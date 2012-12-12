@@ -25,6 +25,8 @@ private:
     void load_sphere_indices(float radius, int segments);
     void load_texture();
 
+    void draw_sphere();
+
 private:
     struct vertex
     {
@@ -33,7 +35,6 @@ private:
 
     struct texcoord
     {
-
         float u, v;
     };
 
@@ -57,13 +58,44 @@ void texturing_scene::draw()
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(projection_));
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(glm::value_ptr(modelview_));
 
     glClearColor(0, 0, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glBindTexture(GL_TEXTURE_2D, texture_->id());
+
+    static GLint max_filters[] = 
+    {
+        GL_NEAREST, GL_LINEAR
+    };
+
+    static GLint min_filters[] = 
+    {
+        GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR
+    };
+
+    for (GLint x = 0; x < 6; ++x)
+    {
+        for (GLint y = 0; y < 2; ++y)
+        {
+            const float x_ofs = (float)x - 2.5f;
+            const float y_ofs = (float)y - 0.5f;
+            const glm::mat4 matrix = glm::translate(modelview_, glm::vec3(x_ofs * 2.5f, y_ofs * 2.5f, 0));
+
+            glMatrixMode(GL_MODELVIEW);
+            glLoadMatrixf(glm::value_ptr(matrix));
+
+            glBindTexture(GL_TEXTURE_2D, texture_->id());
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filters[x]);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, max_filters[y]);
+
+            draw_sphere();
+        }
+    }
+
+}
+
+void texturing_scene::draw_sphere()
+{
     glBindBuffer(GL_ARRAY_BUFFER, verts_->id());
     glVertexPointer(3, GL_FLOAT, 0, NULL);
     glBindBuffer(GL_ARRAY_BUFFER, texcoords_->id());
@@ -97,7 +129,7 @@ void texturing_scene::init()
 
 void texturing_scene::resize(int width, int height)
 {
-    projection_ = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 10.0f);
+    projection_ = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 100.0f);
 }
 
 void texturing_scene::load_texture()
@@ -112,10 +144,6 @@ void texturing_scene::load_texture()
 
     if (texture_id == 0)
         throw file_not_found_exception(filename);
-
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     texture_ = use_gl_texture(texture_id);
 }

@@ -85,6 +85,11 @@ void rotator::mouse_wheel(int wheel, int direction, int x, int y)
     scene_->mouse_wheel(wheel, direction, x, y);
 }
 
+void rotator::keypress(unsigned char key, int x, int y)
+{
+    scene_->keypress(key, x, y);
+}
+
 }
 
 

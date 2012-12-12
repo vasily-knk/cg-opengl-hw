@@ -21,6 +21,7 @@ public:
     void update(float elapsed_seconds); 
     void resize(int width, int height);
     void update_modelview(const glm::mat4 &matrix);
+    void keypress(unsigned char key, int x, int y);
 
 private:
     void load_model();
@@ -32,8 +33,9 @@ private:
     md2_model model_;
     gl_texture texture_;
     
+    size_t anim;
     float frame_;
-    int anim_begin_, anim_end_;
+    //int anim_begin_, anim_end_;
 
     glm::mat4 modelview_, projection_;
 };
@@ -43,8 +45,7 @@ md2_scene::md2_scene(const string &md2_filename, const string &texture_filename)
     : md2_filename_     (md2_filename)
     , texture_filename_ (texture_filename)
     , frame_(0.0f)
-    , anim_begin_(73)
-    , anim_end_  (85)
+    , anim(0)
 {
 
 }
@@ -52,9 +53,14 @@ md2_scene::md2_scene(const string &md2_filename, const string &texture_filename)
 
 void md2_scene::update(float el_time)
 {
-    frame_ += el_time * 6.0f;
-    if (frame_ > anim_end_ - anim_begin_)
-        frame_ -= anim_end_ - anim_begin_;
+    const size_t anim_begin_ = model_.animations().at(anim).begin;
+    const size_t anim_end_   = model_.animations().at(anim).end;
+    if (anim_end_ > anim_begin_)
+    {
+        frame_ += el_time * 6.0f;
+        while (frame_ > anim_end_ - anim_begin_)
+            frame_ -= anim_end_ - anim_begin_;
+    }
 }
 
 void md2_scene::draw()
@@ -69,7 +75,7 @@ void md2_scene::draw()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindTexture(GL_TEXTURE_2D, texture_->id());
-    model_.draw(anim_begin_ + int(frame_));
+    model_.draw(model_.animations().at(anim).begin + int(frame_));
 }
 
 void md2_scene::init()
@@ -93,6 +99,7 @@ void md2_scene::init()
 
     load_model();
     load_texture();
+
 }
 
 void md2_scene::resize(int width, int height)
@@ -131,6 +138,15 @@ void md2_scene::update_modelview(const glm::mat4 &matrix)
 {
     modelview_ = glm::scale(matrix, glm::vec3(0.01f));
     modelview_ = glm::rotate(modelview_, -90.0f, glm::vec3(1, 0, 0));
+}
+
+void md2_scene::keypress(unsigned char key, int, int)
+{
+    if (key == ' ')
+    {
+        anim = (anim + 1) % model_.animations().size();
+        frame_ = 0.0f;
+    }
 }
 
 void glut_init(scene &s);

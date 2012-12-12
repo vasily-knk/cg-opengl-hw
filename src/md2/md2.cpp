@@ -33,5 +33,4 @@ namespace cg_homework
         glDrawElements(GL_TRIANGLES, n_indices_, GL_UNSIGNED_INT, NULL);
     }
 
-
 } // namespace cg_homework
