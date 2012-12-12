@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "md2", "src\md2\md2.vcxproj"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texturing", "src\texturing\texturing.vcxproj", "{6E5DCFE6-4110-4CCD-88D0-C17E17F241B6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "frustum", "src\frustum\frustum.vcxproj", "{234B890C-3997-4D41-B00B-CE0C83ACF673}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -25,6 +27,10 @@ Global
 		{6E5DCFE6-4110-4CCD-88D0-C17E17F241B6}.Debug|Win32.Build.0 = Debug|Win32
 		{6E5DCFE6-4110-4CCD-88D0-C17E17F241B6}.Release|Win32.ActiveCfg = Release|Win32
 		{6E5DCFE6-4110-4CCD-88D0-C17E17F241B6}.Release|Win32.Build.0 = Release|Win32
+		{234B890C-3997-4D41-B00B-CE0C83ACF673}.Debug|Win32.ActiveCfg = Debug|Win32
+		{234B890C-3997-4D41-B00B-CE0C83ACF673}.Debug|Win32.Build.0 = Debug|Win32
+		{234B890C-3997-4D41-B00B-CE0C83ACF673}.Release|Win32.ActiveCfg = Release|Win32
+		{234B890C-3997-4D41-B00B-CE0C83ACF673}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
