@@ -34,6 +34,9 @@ using std::set;
 using boost::posix_time::ptime;
 using boost::posix_time::microsec_clock;
 
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include <GL/glew.h>
 #include <GL/glut.h>
 

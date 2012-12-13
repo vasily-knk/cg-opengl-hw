@@ -26,6 +26,12 @@ void rotator::update(float elapsed_seconds)
     matrix = glm::rotate(matrix, angle_x_, glm::vec3(1, 0, 0));
     matrix = glm::rotate(matrix, angle_y_, glm::vec3(0, 1, 0));
     scene_->update_modelview(matrix);
+
+    glm::mat4 matrix_inv(1.0f);
+    matrix_inv = glm::rotate(matrix_inv, -angle_y_, glm::vec3(0, 1, 0));
+    matrix_inv = glm::rotate(matrix_inv, -angle_x_, glm::vec3(1, 0, 0));
+    matrix_inv = glm::translate(matrix_inv, glm::vec3(0, 0, -dist_));
+    scene_->update_modelview_inv(matrix_inv);
     scene_->update(elapsed_seconds);
 }
 

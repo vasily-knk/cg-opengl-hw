@@ -16,6 +16,7 @@ struct scene
     virtual void keypress(unsigned char /*key*/, int /*x*/, int /*y*/) {}
 
     virtual void update_modelview(const glm::mat4 &/*matrix*/) {}
+    virtual void update_modelview_inv(const glm::mat4 &/*matrix*/) {}
     //virtual void update_projection(const glm::mat4 &/*matrix*/) {}
 };
 
