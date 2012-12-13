@@ -42,24 +42,32 @@ namespace cg_homework
 
     void frustum_scene::draw()
     {
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         glMatrixMode(GL_PROJECTION);
         glLoadMatrixf(glm::value_ptr(projection_));
-
         glMatrixMode(GL_MODELVIEW);
         glLoadMatrixf(glm::value_ptr(modelview_));
 
-        glClearColor(0, 0, 1, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        glDisable(GL_CULL_FACE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        model_.draw();
+        glCullFace(GL_BACK);
+        glColor3f(0.0f, 0.0f, 1.0f);
         model_.draw();
 
         glMatrixMode(GL_PROJECTION);
         glLoadMatrixf(glm::value_ptr(projection_));
-
         glMatrixMode(GL_MODELVIEW);
         const glm::mat4 matrix = modelview_ * cube_modelview_inv_ * cube_projection_inv_;
         glLoadMatrixf(glm::value_ptr(matrix));
+
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDisable(GL_CULL_FACE);
         draw_cube();
     }
 
@@ -75,7 +83,6 @@ namespace cg_homework
         //glEnable(GL_TEXTURE_2D);
 
         glEnableClientState(GL_VERTEX_ARRAY);				
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         load_model();
         load_cube();
