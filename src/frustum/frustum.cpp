@@ -31,6 +31,7 @@ namespace cg_homework
         glm::mat4 modelview_, modelview_inv_, projection_; 
         glm::mat4 cube_modelview_inv_, cube_projection_inv_;
         glm::vec4 plane_, tplane_;
+        float aspect_;
     };
 
     frustum_scene::frustum_scene()
@@ -55,8 +56,8 @@ namespace cg_homework
 
         glMatrixMode(GL_PROJECTION);
         glLoadMatrixf(glm::value_ptr(projection_));
+
         glMatrixMode(GL_MODELVIEW);
-        
         const glm::mat4 matrix = modelview_ * cube_modelview_inv_ * cube_projection_inv_;
         glLoadMatrixf(glm::value_ptr(matrix));
         draw_cube();
@@ -136,10 +137,7 @@ namespace cg_homework
 
     void frustum_scene::resize(int width, int height)
     {
-        const float n = 0.1f;
-        const float f = 100.0f;
-
-        projection_ = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 100.0f);
+        aspect_ = float(width) / height;
     }
 
     void frustum_scene::update_modelview(const glm::mat4 &matrix)
@@ -150,23 +148,33 @@ namespace cg_homework
     void frustum_scene::update_modelview_inv(const glm::mat4 &matrix)
     {
         modelview_inv_ = matrix;
-/*
+
+        const float n = 0.1f;
+        const float f = 100.0f;
+        const float fovy = 45.0f;
+        const glm::mat4 m = glm::perspective(fovy, aspect_, n, f);
+
+        const float range = tan(glm::radians(fovy / 2.0f)) * n;
+        const float lr = range * aspect_;
+        const float tb = range;
+
+        // cutting plane in cam space
         tplane_ = glm::transpose(modelview_inv_) * plane_;
+        const float sx = tplane_.x > 0 ? 1.0f : -1.0f;
+        const float sy = tplane_.y > 0 ? 1.0f : -1.0f;
 
+        const glm::vec4 q(sx * lr / n, sy * tb / n, -1.0f, 1.0f / f);
 
-        cosnt float r = tan(radians(fovy / valType(2))) * zNear;
+        const float a = 2 * glm::dot(glm::row(m, 3), q) / glm::dot(tplane_, q);
+        const glm::vec4 m2 = tplane_ * a - glm::row(m, 3);
 
-        const glm::vec4 Q()
-        
-        glm::mat4 m = projection_;
-*/
-
-
+        projection_ = m;
+        projection_ = glm::row(projection_, 2, m2);
     }
 
     void frustum_scene::keypress(unsigned char key, int, int)
     {
-        if (key == ' ')
+        if (key == ' ')             
         {
             cube_modelview_inv_ = modelview_inv_;
             cube_projection_inv_ = glm::inverse(projection_);
