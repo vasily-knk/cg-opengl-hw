@@ -29,9 +29,9 @@ namespace cg_homework
 
     private:
         typedef GLuint handle;
-        vector<gl_buffer> frames_;
-        gl_buffer texcoords_;
-        gl_buffer indices_;
+        vector<gl_buffer_ptr> frames_;
+        gl_buffer_ptr texcoords_;
+        gl_buffer_ptr indices_;
 
         size_t n_verts_;
         size_t n_texcoords_;

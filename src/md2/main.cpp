@@ -31,7 +31,7 @@ private:
     string md2_filename_;
     string texture_filename_;
     md2_model model_;
-    gl_texture texture_;
+    gl_texture_ptr texture_;
     
     size_t anim;
     float frame_;

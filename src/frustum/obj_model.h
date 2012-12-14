@@ -25,7 +25,7 @@ private:
     void parse_face(const string &str, vector<int> &dst);
 
 private:
-    gl_buffer verts_, indices_;
+    gl_buffer_ptr verts_, indices_;
     size_t n_indices_;
 };
 

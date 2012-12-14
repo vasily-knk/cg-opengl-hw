@@ -26,7 +26,7 @@ namespace cg_homework
 
     private:
         obj_model model_;
-        gl_buffer cube_verts_, cube_indices_;
+        gl_buffer_ptr cube_verts_, cube_indices_;
 
         glm::mat4 modelview_, modelview_inv_, projection_; 
         glm::mat4 cube_modelview_inv_, cube_projection_inv_;

@@ -39,9 +39,9 @@ private:
     };
 
 private:
-    gl_buffer verts_, texcoords_, indices_;
+    gl_buffer_ptr verts_, texcoords_, indices_;
     size_t n_verts_, n_indices_;
-    gl_texture texture_;
+    gl_texture_ptr texture_;
     
     glm::mat4 modelview_, projection_;
 };
