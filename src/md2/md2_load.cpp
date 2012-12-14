@@ -165,20 +165,20 @@ namespace cg_homework
         {
             n_verts_ = frames_buffer[i].size();
             auto verts_ptr = &(frames_buffer[i][0]);
-            frames_[i] = make_gl_buffer();
+            frames_[i] = gl_make<gl_buffer>();
             glBindBuffer(GL_ARRAY_BUFFER, frames_[i]->id());
             glBufferData(GL_ARRAY_BUFFER, n_verts_ * sizeof(vertex), verts_ptr, GL_STATIC_DRAW);
         }
 
         n_texcoords_ = texcoords_buffer.size();
         auto texcoords_ptr = &(texcoords_buffer[0]);
-        texcoords_ = make_gl_buffer();
+        texcoords_ = gl_make<gl_buffer>();
         glBindBuffer(GL_ARRAY_BUFFER, texcoords_->id());
         glBufferData(GL_ARRAY_BUFFER, n_texcoords_ * sizeof(texcoord), texcoords_ptr, GL_STATIC_DRAW);
 
         n_indices_ = indices_buffer.size();
         auto indices_ptr = &(indices_buffer[0]);
-        indices_ = make_gl_buffer();
+        indices_ = gl_make<gl_buffer>();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_->id());
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, n_indices_ * sizeof(int), indices_ptr, GL_STATIC_DRAW);
 

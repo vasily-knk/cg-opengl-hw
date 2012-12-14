@@ -14,6 +14,8 @@ namespace cg_homework
         ~gl_resource() { G::del(id_);    }
 
         GLuint id() const { return id_; }
+
+        typedef shared_ptr<gl_resource<G> > ptr;
         
     private:
         GLuint id_;
@@ -60,27 +62,30 @@ namespace cg_homework
         static void del(GLuint id) { return glDeleteShader(id); }
     };
 
-    typedef gl_resource<gl_buffer_gen > gl_buffer_keeper;
-    typedef gl_resource<gl_texture_gen> gl_texture_keeper;
-    typedef gl_resource<gl_program_gen> gl_program_keeper;
+    typedef gl_resource<gl_buffer_gen > gl_buffer;
+    typedef gl_resource<gl_texture_gen> gl_texture;
+    typedef gl_resource<gl_program_gen> gl_program;
 
-    typedef gl_resource<gl_shader_gen<GL_VERTEX_SHADER  > > gl_vertex_shader_keeper;
-    typedef gl_resource<gl_shader_gen<GL_FRAGMENT_SHADER> > gl_fragment_shader_keeper;
+    typedef gl_resource<gl_shader_gen<GL_VERTEX_SHADER  > > gl_vertex_shader;
+    typedef gl_resource<gl_shader_gen<GL_FRAGMENT_SHADER> > gl_fragment_shader;
     
-    typedef shared_ptr<gl_buffer_keeper > gl_buffer_ptr;
-    typedef shared_ptr<gl_texture_keeper> gl_texture_ptr;
+    typedef shared_ptr<gl_buffer > gl_buffer_ptr;
+    typedef shared_ptr<gl_texture> gl_texture_ptr;
 
-    typedef shared_ptr<gl_vertex_shader_keeper  > gl_vertex_shader_ptr;
-    typedef shared_ptr<gl_fragment_shader_keeper> gl_fragment_shader_ptr;
-    typedef shared_ptr<gl_program_keeper> gl_program_ptr;
+    typedef shared_ptr<gl_vertex_shader  > gl_vertex_shader_ptr;
+    typedef shared_ptr<gl_fragment_shader> gl_fragment_shader_ptr;
+    typedef shared_ptr<gl_program> gl_program_ptr;
 
-    inline gl_buffer_ptr  make_gl_buffer ()                 { return make_shared<gl_buffer_keeper>();         }
-    inline gl_buffer_ptr  use_gl_buffer  (GLuint id)        { return make_shared<gl_buffer_keeper>(id);       }
-    inline gl_texture_ptr make_gl_texture()                 { return make_shared<gl_texture_keeper>();        }
-    inline gl_texture_ptr use_gl_texture (GLuint id)        { return make_shared<gl_texture_keeper>(id);      }
-    inline gl_vertex_shader_ptr   make_gl_vertex_shader()   { return make_shared<gl_vertex_shader_keeper>();  }
-    inline gl_fragment_shader_ptr make_gl_fragment_shader() { return make_shared<gl_fragment_shader_keeper>();}
-    inline gl_program_ptr make_gl_program()                 { return make_shared<gl_program_keeper>();        }
-    inline gl_program_ptr use_gl_program (GLuint id)        { return make_shared<gl_program_keeper>(id);      }
+    template<typename T>
+    shared_ptr<T> gl_make()
+    {
+        return make_shared<T>();
+    }
+
+    template<typename T>
+    shared_ptr<T> gl_use(GLuint id)
+    {
+        return make_shared<T>(id);
+    }
 }
 

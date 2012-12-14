@@ -30,12 +30,12 @@ void obj_model::load(std::istream &stream)
             parse_face(substr, indices);
     }
 
-    verts_ = make_gl_buffer();
+    verts_ = gl_make<gl_buffer>();
     glBindBuffer(GL_ARRAY_BUFFER, verts_->id());
     glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(vec3_t), &verts.at(0), GL_STATIC_DRAW);
 
     n_indices_ = indices.size();
-    indices_ = make_gl_buffer();
+    indices_ = gl_make<gl_buffer>();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_->id());
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(int), &indices.at(0), GL_STATIC_DRAW);
 

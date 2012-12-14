@@ -123,11 +123,11 @@ namespace cg_homework
             1, 3, 7, 7, 5, 1  // +z
         };
 
-        cube_verts_ = make_gl_buffer();
+        cube_verts_ = gl_make<gl_buffer>();
         glBindBuffer(GL_ARRAY_BUFFER, cube_verts_->id());
         glBufferData(GL_ARRAY_BUFFER, 12 * 8, verts, GL_STATIC_DRAW);
 
-        cube_indices_ = make_gl_buffer();
+        cube_indices_ = gl_make<gl_buffer>();
         glBindBuffer(GL_ARRAY_BUFFER, cube_indices_->id());
         glBufferData(GL_ARRAY_BUFFER, 12 * 12, indices, GL_STATIC_DRAW);
         

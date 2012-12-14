@@ -131,7 +131,7 @@ void md2_scene::load_texture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    texture_ = use_gl_texture(texture_id);
+    texture_ = gl_use<gl_texture>(texture_id);
 }
 
 void md2_scene::update_modelview(const glm::mat4 &matrix)

@@ -152,11 +152,11 @@ namespace cg_homework
         }
 
         n_verts_ = verts.size();
-        verts_ = make_gl_buffer();
+        verts_ = gl_make<gl_buffer>();
         glBindBuffer(GL_ARRAY_BUFFER, verts_->id());
         glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(vertex), &verts.at(0), GL_STATIC_DRAW);
 
-        texcoords_ = make_gl_buffer();
+        texcoords_ = gl_make<gl_buffer>();
         glBindBuffer(GL_ARRAY_BUFFER, texcoords_->id());
         glBufferData(GL_ARRAY_BUFFER, texcoords.size() * sizeof(vertex), &texcoords.at(0), GL_STATIC_DRAW);
     }
@@ -183,7 +183,7 @@ namespace cg_homework
         }
 
         n_indices_ = indices.size();
-        indices_ = make_gl_buffer();
+        indices_ = gl_make<gl_buffer>();
         glBindBuffer(GL_ARRAY_BUFFER, indices_->id());
         glBufferData(GL_ARRAY_BUFFER, indices.size() * 4, &indices.at(0), GL_STATIC_DRAW);
     }

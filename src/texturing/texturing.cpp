@@ -145,7 +145,7 @@ void texturing_scene::load_texture()
     if (texture_id == 0)
         throw file_not_found_exception(filename);
 
-    texture_ = use_gl_texture(texture_id);
+    texture_ = gl_use<gl_texture>(texture_id);
 }
 
 void texturing_scene::update_modelview(const glm::mat4 &matrix)
@@ -190,11 +190,11 @@ void texturing_scene::load_sphere_verts(float radius, int segments)
     }
 
     n_verts_ = verts.size();
-    verts_ = make_gl_buffer();
+    verts_ = gl_make<gl_buffer>();
     glBindBuffer(GL_ARRAY_BUFFER, verts_->id());
     glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(vertex), &verts.at(0), GL_STATIC_DRAW);
 
-    texcoords_ = make_gl_buffer();
+    texcoords_ = gl_make<gl_buffer>();
     glBindBuffer(GL_ARRAY_BUFFER, texcoords_->id());
     glBufferData(GL_ARRAY_BUFFER, texcoords.size() * sizeof(vertex), &texcoords.at(0), GL_STATIC_DRAW);
 }
@@ -221,7 +221,7 @@ void texturing_scene::load_sphere_indices(float radius, int segments)
     }
 
     n_indices_ = indices.size();
-    indices_ = make_gl_buffer();
+    indices_ = gl_make<gl_buffer>();
     glBindBuffer(GL_ARRAY_BUFFER, indices_->id());
     glBufferData(GL_ARRAY_BUFFER, indices.size() * 4, &indices.at(0), GL_STATIC_DRAW);
 }
