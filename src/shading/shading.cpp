@@ -4,6 +4,7 @@
 #include "../shared/rotator.h"
 #include "../shared/stuff.h"
 
+
 namespace cg_homework
 {
     class shading_scene : public scene
@@ -247,6 +248,11 @@ namespace cg_homework
 int main(int argc, char **argv)
 {
     using namespace cg_homework;
+
+    string fuck = "hello" " "
+        "world";
+
+    cout << fuck << endl;
 
     shading_scene scene;
     rotator r(scene);
