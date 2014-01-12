@@ -64,6 +64,9 @@ void obj_model::parse_face(const string &str, vector<int> &dst)
 
     BOOST_FOREACH(const string &block, blocks)
     {
+        if (block.empty())
+            continue;
+        
         vector<string> numbers;
         boost::split(numbers, block, is_slash);
 

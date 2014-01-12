@@ -8,28 +8,21 @@ uniform mat4 modelview_inv;
 uniform mat4 projection;
 uniform vec4 light_pos;
 
-varying float light;
+out vec3 normal_cam;
+out vec3 position_cam;
+out vec3 light_dir;
+//out float light;
 
 void main()
 {
-	const vec4 position_world = vec4(in_position, 1.0f);
-	const vec4 position_cam = modelview * position_world;
-    gl_Position = projection * position_cam;
-	
-	const vec3 normal_cam = vec3(modelview_inv * vec4(in_normal, 1.0f));
-	vec3 light_dir = light_pos.xyz - position_cam.xyz;
+	vec4 position_world = vec4(in_position, 1.0f);
+	vec4 position_cam4 = modelview * position_world;
+    gl_Position = projection * position_cam4;
 
+	position_cam = vec3(position_cam4);
+	 
+	normal_cam = vec3(modelview_inv * vec4(in_normal, 1.0f));
+	light_dir = vec3(light_pos) - position_cam;
 	light_dir = normalize(light_dir);
-	light = dot(normal_cam, light_dir);
-	light = clamp(light, 0, 1);
-
-	const vec3 refl = reflect(-light_dir, normal_cam.xyz);
-	float phong = dot(-normalize(position_cam), normalize(refl));
-	phong = clamp(phong, 0, 1);
-	phong = light > 0.00001 ? phong : 0.0;
-	phong = pow(phong, 2);
-
-	light = light + phong;
-
 }
 	

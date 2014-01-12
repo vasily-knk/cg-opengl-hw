@@ -7,6 +7,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <IntDir>$(SolutionDir)out\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>C:\stuff\soil\src;C:\stuff\freeglut\include;C:\stuff\glm;C:\stuff\glew-1.10.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\stuff\glew-1.10.0\lib\Release\Win32;C:\stuff\freeglut\lib;C:\stuff\soil\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>

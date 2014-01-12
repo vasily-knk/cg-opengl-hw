@@ -46,6 +46,7 @@ namespace cg_homework
         glm::mat4 modelview_, modelview_inv_, projection_;
         GLuint modelview_id_, modelview_inv_id_, projection_id_;
         GLuint light_pos_id_;
+        GLuint phong_power_id_;
         
         float light_angle_;
     };
@@ -67,6 +68,7 @@ namespace cg_homework
         glUniformMatrix4fv(projection_id_, 1, GL_FALSE, glm::value_ptr(projection_));
         //glUniformMatrix4fv
         glUniform4fv(light_pos_id_, 1, glm::value_ptr(light_pos));
+        glUniform1f(phong_power_id_, 4.);
 
         glClearColor(0, 0, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -127,6 +129,7 @@ namespace cg_homework
         modelview_inv_id_ = glGetUniformLocation(program_->id(), "modelview_inv");
         projection_id_ = glGetUniformLocation(program_->id(), "projection");
         light_pos_id_ = glGetUniformLocation(program_->id(), "light_pos");
+        phong_power_id_ = glGetUniformLocation(program_->id(), "phong_power");
 
         const float radius = 1.0f;
         const int segments = 32;
@@ -248,11 +251,6 @@ namespace cg_homework
 int main(int argc, char **argv)
 {
     using namespace cg_homework;
-
-    string fuck = "hello" " "
-        "world";
-
-    cout << fuck << endl;
 
     shading_scene scene;
     rotator r(scene);
