@@ -37,7 +37,10 @@
     <None Include="vertex.glsl">
       <Filter>shaders</Filter>
     </None>
-    <None Include="fragment.glsl">
+    <None Include="fragment_phong.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="fragment_blinn.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

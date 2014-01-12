@@ -90,7 +90,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.glsl" />
+    <None Include="fragment_blinn.glsl" />
+    <None Include="fragment_phong.glsl" />
     <None Include="vertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

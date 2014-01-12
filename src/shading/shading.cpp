@@ -41,13 +41,29 @@ namespace cg_homework
         gl_buffer_ptr verts_, normals_, texcoords_, indices_;
         size_t n_verts_, n_indices_;
         gl_texture_ptr texture_;
-        gl_program_ptr program_;
-
-        glm::mat4 modelview_, modelview_inv_, projection_;
-        GLuint modelview_id_, modelview_inv_id_, projection_id_;
-        GLuint light_pos_id_;
-        GLuint phong_power_id_;
         
+        struct mode_t
+        {
+            mode_t(gl_program_ptr prog)
+                : program(prog)
+            {
+                modelview_id     = glGetUniformLocation(program->id(), "modelview");
+                modelview_inv_id = glGetUniformLocation(program->id(), "modelview_inv");
+                projection_id    = glGetUniformLocation(program->id(), "projection");
+                light_pos_id     = glGetUniformLocation(program->id(), "light_pos");
+                power_id         = glGetUniformLocation(program->id(), "power");
+            }
+
+            
+            gl_program_ptr program;
+            GLuint modelview_id, modelview_inv_id, projection_id;
+            GLuint light_pos_id;
+            GLuint power_id;
+        };
+
+        vector<mode_t> modes_;
+        
+        glm::mat4 modelview_, modelview_inv_, projection_;
         float light_angle_;
     };
 
@@ -65,29 +81,37 @@ namespace cg_homework
         glm::vec4 light_pos(light_radius * cos(light_angle_), 0.0f, light_radius * sin(light_angle_), 1.0f);
         light_pos = modelview_ * light_pos;
 
-        glUniformMatrix4fv(projection_id_, 1, GL_FALSE, glm::value_ptr(projection_));
-        //glUniformMatrix4fv
-        glUniform4fv(light_pos_id_, 1, glm::value_ptr(light_pos));
-        glUniform1f(phong_power_id_, 4.);
+        BOOST_FOREACH(const mode_t &mode, modes_)
+        {
+            glUseProgram(mode.program->id());
+            glUniformMatrix4fv(mode.projection_id, 1, GL_FALSE, glm::value_ptr(projection_));
+            glUniform4fv(mode.light_pos_id, 1, glm::value_ptr(light_pos));
+        }
+        
+        glUseProgram(modes_.at(0).program->id());
+        glUniform1f(modes_.at(0).power_id, 4.);
+        glUseProgram(modes_.at(1).program->id());
+        glUniform1f(modes_.at(1).power_id, 10.);
 
         glClearColor(0, 0, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(program_->id());
-        const int xs = 3, ys = 2;
+        const int xs = 1, ys = modes_.size();
 
         for (GLint x = 0; x < xs; ++x)
         {
             for (GLint y = 0; y < ys; ++y)
             {
+                glUseProgram(modes_.at(y).program->id());
+
                 const float x_ofs = float(x) - (float(xs) / 2 - 0.5f);
                 const float y_ofs = float(y) - (float(ys) / 2 - 0.5f);
                 const glm::mat4 matrix = glm::translate(modelview_, glm::vec3(x_ofs * 2.5f, y_ofs * 2.5f, 0));
                 const glm::mat4 inv = glm::transpose(glm::inverse(matrix));
 
-                glUniformMatrix4fv(modelview_id_, 1, GL_FALSE, glm::value_ptr(matrix));
+                glUniformMatrix4fv(modes_.at(y).modelview_id, 1, GL_FALSE, glm::value_ptr(matrix));
                 // translation doesn't affect normals, so using modelview_inv_
-                glUniformMatrix4fv(modelview_inv_id_, 1, GL_FALSE, glm::value_ptr(modelview_inv_));
+                glUniformMatrix4fv(modes_.at(y).modelview_inv_id, 1, GL_FALSE, glm::value_ptr(modelview_inv_));
                 draw_sphere();
             }
         }
@@ -124,13 +148,9 @@ namespace cg_homework
         //glEnableVertexAttribArray(0);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        program_ = gl_use<gl_program>(LoadShaders("vertex.glsl", "fragment.glsl"));
-        modelview_id_ = glGetUniformLocation(program_->id(), "modelview");
-        modelview_inv_id_ = glGetUniformLocation(program_->id(), "modelview_inv");
-        projection_id_ = glGetUniformLocation(program_->id(), "projection");
-        light_pos_id_ = glGetUniformLocation(program_->id(), "light_pos");
-        phong_power_id_ = glGetUniformLocation(program_->id(), "phong_power");
-
+        modes_.push_back(mode_t(gl_use<gl_program>(LoadShaders("vertex.glsl", "fragment_phong.glsl"))));
+        modes_.push_back(mode_t(gl_use<gl_program>(LoadShaders("vertex.glsl", "fragment_blinn.glsl"))));
+        
         const float radius = 1.0f;
         const int segments = 32;
 
