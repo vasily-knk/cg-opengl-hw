@@ -18,12 +18,14 @@ namespace cg_homework
         void update_modelview(const glm::mat4 &matrix);
         void update_modelview_inv(const glm::mat4 &matrix);
         void update(float elapsed_seconds);
+        void keypress(unsigned char /*key*/, int /*x*/, int /*y*/);
 
     private:
         void load_sphere_verts(float radius, int segments);
         void load_sphere_indices(float radius, int segments);
 
         void draw_sphere();
+        void apply_parameters(size_t mode_id); 
 
     private:
        /* struct vertex
@@ -44,74 +46,91 @@ namespace cg_homework
         
         struct mode_t
         {
-            mode_t(gl_program_ptr prog)
-                : program(prog)
+            mode_t(const string &name, gl_program_ptr prog)
+                : name(name)
+                , program(prog)
             {
                 modelview_id     = glGetUniformLocation(program->id(), "modelview");
                 modelview_inv_id = glGetUniformLocation(program->id(), "modelview_inv");
                 projection_id    = glGetUniformLocation(program->id(), "projection");
                 light_pos_id     = glGetUniformLocation(program->id(), "light_pos");
                 power_id         = glGetUniformLocation(program->id(), "power");
+                diffuse_id       = glGetUniformLocation(program->id(), "diffuse_color");
+                specular_id      = glGetUniformLocation(program->id(), "specular_color");
+                ambient_id       = glGetUniformLocation(program->id(), "ambient_factor");
+                atten_id         = glGetUniformLocation(program->id(), "atten_factor");
             }
 
-            
+            string name;
             gl_program_ptr program;
             GLuint modelview_id, modelview_inv_id, projection_id;
             GLuint light_pos_id;
             GLuint power_id;
+            GLuint diffuse_id, specular_id, ambient_id;
+            GLuint atten_id;
         };
 
         vector<mode_t> modes_;
+        size_t mode_;
         
         glm::mat4 modelview_, modelview_inv_, projection_;
-        float light_angle_;
+        float light_angle_, light_radius_;
     };
 
 
     shading_scene::shading_scene()
         : light_angle_(0.0f)
+        , light_radius_(5.0f)
+        , mode_(0)
     {
 
     }
 
 
+    void shading_scene::apply_parameters(size_t mode_id)
+    {
+        const mode_t &mode = modes_.at(mode_id);
+
+        glm::vec4 light_pos(light_radius_ * cos(light_angle_), 0.0f, light_radius_ * sin(light_angle_), 1.0f);
+        light_pos = modelview_ * light_pos;
+        glUseProgram(mode.program->id());
+        glUniformMatrix4fv(mode.projection_id, 1, GL_FALSE, glm::value_ptr(projection_));
+        glUniform4fv(mode.light_pos_id, 1, glm::value_ptr(light_pos));
+
+        const float power = 4.;
+        const float atten_factor = 0.3;
+        const glm::vec4 diffuse(1, 0, 0, 1);
+        const glm::vec4 specular(0.5, 0.5, 0.5, 0.5);
+        const float ambient_factor = 0.2;
+
+        glUniform1f(mode.power_id, 4.);
+        glUniform4fv(mode.diffuse_id, 1, glm::value_ptr(diffuse));
+        glUniform4fv(mode.specular_id, 1, glm::value_ptr(specular));
+        glUniform1f(mode.atten_id, atten_factor);
+        glUniform1f(mode.ambient_id, ambient_factor);
+    }
+    
     void shading_scene::draw()
     {
-        const float light_radius = 5.0f;
-        glm::vec4 light_pos(light_radius * cos(light_angle_), 0.0f, light_radius * sin(light_angle_), 1.0f);
-        light_pos = modelview_ * light_pos;
-
-        BOOST_FOREACH(const mode_t &mode, modes_)
-        {
-            glUseProgram(mode.program->id());
-            glUniformMatrix4fv(mode.projection_id, 1, GL_FALSE, glm::value_ptr(projection_));
-            glUniform4fv(mode.light_pos_id, 1, glm::value_ptr(light_pos));
-        }
-        
-        glUseProgram(modes_.at(0).program->id());
-        glUniform1f(modes_.at(0).power_id, 4.);
-        glUseProgram(modes_.at(1).program->id());
-        glUniform1f(modes_.at(1).power_id, 10.);
-
         glClearColor(0, 0, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        const int xs = 1, ys = modes_.size();
+        const int xs = 3, ys = 2;
+        apply_parameters(mode_);
 
         for (GLint x = 0; x < xs; ++x)
         {
             for (GLint y = 0; y < ys; ++y)
             {
-                glUseProgram(modes_.at(y).program->id());
 
                 const float x_ofs = float(x) - (float(xs) / 2 - 0.5f);
                 const float y_ofs = float(y) - (float(ys) / 2 - 0.5f);
                 const glm::mat4 matrix = glm::translate(modelview_, glm::vec3(x_ofs * 2.5f, y_ofs * 2.5f, 0));
                 const glm::mat4 inv = glm::transpose(glm::inverse(matrix));
 
-                glUniformMatrix4fv(modes_.at(y).modelview_id, 1, GL_FALSE, glm::value_ptr(matrix));
+                glUniformMatrix4fv(modes_.at(mode_).modelview_id, 1, GL_FALSE, glm::value_ptr(matrix));
                 // translation doesn't affect normals, so using modelview_inv_
-                glUniformMatrix4fv(modes_.at(y).modelview_inv_id, 1, GL_FALSE, glm::value_ptr(modelview_inv_));
+                glUniformMatrix4fv(modes_.at(mode_).modelview_inv_id, 1, GL_FALSE, glm::value_ptr(modelview_inv_));
                 draw_sphere();
             }
         }
@@ -148,8 +167,8 @@ namespace cg_homework
         //glEnableVertexAttribArray(0);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        modes_.push_back(mode_t(gl_use<gl_program>(LoadShaders("vertex.glsl", "fragment_phong.glsl"))));
-        modes_.push_back(mode_t(gl_use<gl_program>(LoadShaders("vertex.glsl", "fragment_blinn.glsl"))));
+        modes_.push_back(mode_t("phong", gl_use<gl_program>(LoadShaders("vertex.glsl", "fragment_phong.glsl"))));
+        modes_.push_back(mode_t("blinn", gl_use<gl_program>(LoadShaders("vertex.glsl", "fragment_blinn.glsl"))));
         
         const float radius = 1.0f;
         const int segments = 32;
@@ -262,6 +281,31 @@ namespace cg_homework
         while (light_angle_ > PI * 2.0f)
             light_angle_ -= PI * 2.0f;
     }
+
+    void shading_scene::keypress(unsigned char key, int /*x*/, int /*y*/)
+    {
+        const float radius_speed = 0.1f;
+
+        switch(key)
+        {
+        case ' ':
+            mode_ = (mode_ + 1) % modes_.size();
+            cout << "Mode: " << modes_.at(mode_).name << endl;
+            break;
+        case '-':
+        case '=':
+        case '+':
+            if (key == '-')
+                light_radius_ = std::max(light_radius_ - radius_speed, 3.0f);
+            else
+                light_radius_ = light_radius_ + radius_speed;
+            cout << "light distance: " << light_radius_ << endl;
+            break;
+        }
+      
+    }
+
+
 
     void glut_init(scene &s);
     void glut_main_loop();
