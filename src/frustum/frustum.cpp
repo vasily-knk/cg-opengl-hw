@@ -28,14 +28,16 @@ namespace cg_homework
         obj_model model_;
         gl_buffer_ptr cube_verts_, cube_indices_;
 
-        glm::mat4 modelview_, modelview_inv_, projection_; 
+        glm::mat4 modelview_, modelview_inv_, clipped_projection_, usual_projection_; 
         glm::mat4 cube_modelview_inv_, cube_projection_inv_;
         glm::vec4 plane_, tplane_;
         float aspect_;
+        bool draw_frustum_;
     };
 
     frustum_scene::frustum_scene()
         : plane_(0.0f, 1.0f, 0.0f, 0.0f)
+        , draw_frustum_(false)
     {
 
     }
@@ -46,7 +48,7 @@ namespace cg_homework
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf(glm::value_ptr(projection_));
+        glLoadMatrixf(glm::value_ptr(clipped_projection_));
         glMatrixMode(GL_MODELVIEW);
         glLoadMatrixf(glm::value_ptr(modelview_));
 
@@ -59,16 +61,19 @@ namespace cg_homework
         glColor3f(0.0f, 0.0f, 1.0f);
         model_.draw();
 
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf(glm::value_ptr(projection_));
-        glMatrixMode(GL_MODELVIEW);
-        const glm::mat4 matrix = modelview_ * cube_modelview_inv_ * cube_projection_inv_;
-        glLoadMatrixf(glm::value_ptr(matrix));
+        if (draw_frustum_)
+        {
+            glMatrixMode(GL_PROJECTION);
+            glLoadMatrixf(glm::value_ptr(usual_projection_));
+            glMatrixMode(GL_MODELVIEW);
+            const glm::mat4 matrix = modelview_ * cube_modelview_inv_ * cube_projection_inv_;
+            glLoadMatrixf(glm::value_ptr(matrix));
 
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glDisable(GL_CULL_FACE);
-        draw_cube();
+            glColor3f(1.0f, 1.0f, 1.0f);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glDisable(GL_CULL_FACE);
+            draw_cube();
+        }
     }
 
     void frustum_scene::init()
@@ -101,35 +106,28 @@ namespace cg_homework
 
     void frustum_scene::load_cube()
     {
-        float verts[] = 
-        {
-            -1, -1, -1,
-            -1, -1,  1,
-            -1,  1, -1,
-            -1,  1,  1,
-             1, -1, -1,
-             1, -1,  1,
-             1, -1,  1,
-             1,  1,  1
+        static const float verts[] = {
+            -1.0, -1.0,  1.0,
+            1.0, -1.0,  1.0,
+            -1.0,  1.0,  1.0,
+            1.0,  1.0,  1.0,
+            -1.0, -1.0, -1.0,
+            1.0, -1.0, -1.0,
+            -1.0,  1.0, -1.0,
+            1.0,  1.0, -1.0,
         };
 
-        int indices[] = 
-        {
-            0, 2, 3, 3, 1, 0, // -x
-            7, 6, 4, 4, 5, 7, // +x
-            0, 1, 5, 5, 4, 1, // -y
-            7, 3, 2, 2, 6, 7, // +y
-            0, 4, 6, 6, 2, 0, // -z
-            1, 3, 7, 7, 5, 1  // +z
+        static const int indices[] = {
+            0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1
         };
 
         cube_verts_ = gl_make<gl_buffer>();
         glBindBuffer(GL_ARRAY_BUFFER, cube_verts_->id());
-        glBufferData(GL_ARRAY_BUFFER, 12 * 8, verts, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
         cube_indices_ = gl_make<gl_buffer>();
         glBindBuffer(GL_ARRAY_BUFFER, cube_indices_->id());
-        glBufferData(GL_ARRAY_BUFFER, 12 * 12, indices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
         
     }
 
@@ -139,7 +137,7 @@ namespace cg_homework
         glVertexPointer(3, GL_FLOAT, 0, NULL);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_indices_->id());
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
+        glDrawElements(GL_TRIANGLE_STRIP, 14, GL_UNSIGNED_INT, NULL);
     }
 
     void frustum_scene::resize(int width, int height)
@@ -175,8 +173,9 @@ namespace cg_homework
         const float a = 2 * glm::dot(glm::row(m, 3), q) / glm::dot(tplane_, q);
         const glm::vec4 m2 = tplane_ * a - glm::row(m, 3);
 
-        projection_ = m;
-        projection_ = glm::row(projection_, 2, m2);
+        clipped_projection_ = m;
+        usual_projection_ = m;
+        clipped_projection_ = glm::row(clipped_projection_, 2, m2);
     }
 
     void frustum_scene::keypress(unsigned char key, int, int)
@@ -184,7 +183,8 @@ namespace cg_homework
         if (key == ' ')             
         {
             cube_modelview_inv_ = modelview_inv_;
-            cube_projection_inv_ = glm::inverse(projection_);
+            cube_projection_inv_ = glm::inverse(clipped_projection_);
+            draw_frustum_ = true;
         }
     }
 
